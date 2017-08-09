@@ -224,7 +224,6 @@ void ofxBasicSoundPlayer::updatePositions(int nFrames){
 
 void ofxBasicSoundPlayer::audioOut(ofSoundBuffer& outputBuffer){
 	if(bIsPlaying){
-		cout << "audio out" << endl;
 		int nFrames = outputBuffer.getNumFrames();
 		int nChannels = outputBuffer.getNumChannels();
         if (playerNumChannels != nChannels || playerNumFrames != nFrames || playerSampleRate != outputBuffer.getSampleRate()) {
