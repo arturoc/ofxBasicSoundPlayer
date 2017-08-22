@@ -36,6 +36,8 @@ ofxBasicSoundPlayer::~ofxBasicSoundPlayer() {
 
 bool ofxBasicSoundPlayer::load(const std::filesystem::path& filePath, bool _stream){
 	std::unique_lock<std::mutex> lck(mtx);
+	bIsPlaying = false;
+	bIsLoaded = false;
     ofLogVerbose() << "ofxBasicSoundPlayer::load" << endl << "Loading file: " << filePath.string();
 	bIsLoaded = soundFile.load(filePath.string());
 	if(!bIsLoaded) return false;
