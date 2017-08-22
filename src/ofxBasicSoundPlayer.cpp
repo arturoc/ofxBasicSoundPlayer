@@ -35,6 +35,7 @@ ofxBasicSoundPlayer::~ofxBasicSoundPlayer() {
 }
 
 bool ofxBasicSoundPlayer::load(const std::filesystem::path& filePath, bool _stream){
+	std::unique_lock<std::mutex> lck(mtx);
     ofLogVerbose() << "ofxBasicSoundPlayer::load" << endl << "Loading file: " << filePath.string();
 	bIsLoaded = soundFile.load(filePath.string());
 	if(!bIsLoaded) return false;
@@ -71,6 +72,7 @@ void ofxBasicSoundPlayer::audioOutBuffersChanged(int nFrames, int nChannels, int
 }
 
 void ofxBasicSoundPlayer::unload(){
+	std::unique_lock<std::mutex> lck(mtx);
 	soundFile.close();
 	buffer.clear();
 	bIsPlaying = false;
@@ -79,6 +81,7 @@ void ofxBasicSoundPlayer::unload(){
 }
 
 void ofxBasicSoundPlayer::play(){
+	std::unique_lock<std::mutex> lck(mtx);
 	int pos=0;
 	float relSpeed = speed*(double(soundFile.getSampleRate())/double(playerSampleRate));
 	float left,right;
@@ -104,6 +107,7 @@ void ofxBasicSoundPlayer::play(){
 }
 
 void ofxBasicSoundPlayer::stop(){
+	std::unique_lock<std::mutex> lck(mtx);
 	bIsPlaying = false;
 
 	if (streaming){
@@ -224,7 +228,7 @@ void ofxBasicSoundPlayer::updatePositions(int nFrames){
 
 void ofxBasicSoundPlayer::audioOut(ofSoundBuffer& outputBuffer){
 	if(bIsPlaying){
-		cout << "audio out" << endl;
+		std::unique_lock<std::mutex> lck(mtx);
 		int nFrames = outputBuffer.getNumFrames();
 		int nChannels = outputBuffer.getNumChannels();
         if (playerNumChannels != nChannels || playerNumFrames != nFrames || playerSampleRate != outputBuffer.getSampleRate()) {

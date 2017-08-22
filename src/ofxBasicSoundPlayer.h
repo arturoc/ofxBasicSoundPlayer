@@ -79,6 +79,7 @@ private:
 	vector<unsigned int> positions;
 	vector<float> volumesLeft;
 	vector<float> volumesRight;	
+	std::mutex mtx;
 };
 
 
