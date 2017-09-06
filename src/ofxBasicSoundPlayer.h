@@ -75,10 +75,10 @@ private:
 	bool loop;
 	float speed;
 	float pan;
-	vector<float> relativeSpeed;
-	vector<unsigned int> positions;
-	vector<float> volumesLeft;
-	vector<float> volumesRight;	
+	std::vector<float> relativeSpeed;
+	std::vector<unsigned int> positions;
+	std::vector<float> volumesLeft;
+	std::vector<float> volumesRight;
 	std::mutex mtx;
 };
 

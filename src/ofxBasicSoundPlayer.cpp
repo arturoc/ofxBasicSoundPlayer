@@ -13,6 +13,7 @@
 int ofxBasicSoundPlayer::maxSoundsTotal=128;
 int ofxBasicSoundPlayer::maxSoundsPerPlayer=16;
 
+using namespace std;
 
 ofxBasicSoundPlayer::ofxBasicSoundPlayer() {
 	volume = 1;
@@ -84,6 +85,7 @@ void ofxBasicSoundPlayer::unload(){
 
 void ofxBasicSoundPlayer::play(){
 	std::unique_lock<std::mutex> lck(mtx);
+	if(!bIsLoaded) return;
 	int pos=0;
 	float relSpeed = speed*(double(soundFile.getSampleRate())/double(playerSampleRate));
 	float left,right;
@@ -120,16 +122,19 @@ void ofxBasicSoundPlayer::stop(){
 
 
 void ofxBasicSoundPlayer::setVolume(float vol){
+	if(!bIsLoaded) return;
 	volume = vol;
 	ofStereoVolumes(volume,pan,volumesLeft.back(),volumesRight.back());
 }
 
 void ofxBasicSoundPlayer::setPan(float _pan){
+	if(!bIsLoaded) return;
 	pan = _pan;
 	ofStereoVolumes(volume,pan,volumesLeft.back(),volumesRight.back());
 }
 
 void ofxBasicSoundPlayer::setSpeed(float spd){
+	if(!bIsLoaded) return;
 	if ( streaming && fabsf(spd-1.0f)<FLT_EPSILON ){
 		ofLogWarning("ofxBasicSoundPlayer") << "setting speed is not supported on streaming sounds";
 		return;
@@ -139,14 +144,17 @@ void ofxBasicSoundPlayer::setSpeed(float spd){
 }
 
 void ofxBasicSoundPlayer::setPaused(bool bP){
+	if(!bIsLoaded) return;
 	bIsPlaying = false;
 }
 
 void ofxBasicSoundPlayer::setLoop(bool bLp){
+	if(!bIsLoaded) return;
 	loop = bLp;
 }
 
 void ofxBasicSoundPlayer::setMultiPlay(bool bMp){
+	if(!bIsLoaded) return;
 	multiplay = bMp;
 	if(!multiplay){
 		positions.resize(1);
@@ -157,36 +165,40 @@ void ofxBasicSoundPlayer::setMultiPlay(bool bMp){
 }
 
 void ofxBasicSoundPlayer::setPosition(float pct){
+	if(!bIsLoaded) return;
 	positions.back() = pct*buffer.getNumFrames();
 }
 
 void ofxBasicSoundPlayer::setPositionMS(int ms){
+	if(!bIsLoaded) return;
 	setPosition(float(ms)/float(buffer.getDurationMS()));
 }
 
 
 float ofxBasicSoundPlayer::getPosition() const{
+	if(!bIsLoaded) return 0.f;
 	return float(positions.back())/float(buffer.getNumFrames());
 }
 
 int ofxBasicSoundPlayer::getPositionMS() const{
+	if(!bIsLoaded) return 0;
 	return float(positions.back())*1000./buffer.getSampleRate();
 }
 
 bool ofxBasicSoundPlayer::isPlaying() const{
-	return bIsPlaying;
+	return bIsLoaded && bIsPlaying;
 }
 
 bool ofxBasicSoundPlayer::getIsLooping() const{
-	return loop;
+	return bIsLoaded && loop;
 }
 
 float ofxBasicSoundPlayer::getSpeed() const{
-	return speed;
+	return bIsLoaded && speed;
 }
 
 float ofxBasicSoundPlayer::getPan() const{
-	return pan;
+	return bIsLoaded && pan;
 }
 
 bool ofxBasicSoundPlayer::isLoaded() const{
@@ -198,10 +210,12 @@ float ofxBasicSoundPlayer::getVolume() const{
 }
 
 unsigned long ofxBasicSoundPlayer::getDurationMS(){
+	if(!bIsLoaded) return 0.f;
 	return buffer.getDurationMS();
 }
 
 void ofxBasicSoundPlayer::updatePositions(int nFrames){
+	if(!bIsLoaded) return;
 	for(int i=0;i<(int)positions.size();i++){
 		// update positions
 		positions[i] += nFrames*relativeSpeed[i];
@@ -229,6 +243,7 @@ void ofxBasicSoundPlayer::updatePositions(int nFrames){
 }
 
 void ofxBasicSoundPlayer::audioOut(ofSoundBuffer& outputBuffer){
+	if(!bIsLoaded) return;
 	if(bIsPlaying){
 		std::unique_lock<std::mutex> lck(mtx);
 		int nFrames = outputBuffer.getNumFrames();

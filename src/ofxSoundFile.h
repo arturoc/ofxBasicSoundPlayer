@@ -28,15 +28,15 @@
 /// reads a sound file into an ofSoundBuffer.
 /// encoding support varies by platform.
 /// Windows and OSX use libaudiodecoder for decoding, Linux uses libsndfile
-bool ofxLoadSound(ofSoundBuffer &buffer, string path);
+bool ofxLoadSound(ofSoundBuffer &buffer, std::string path);
 
 /// writes an ofSoundBuffer as a 16-bit PCM WAV file.
-bool ofxSaveSound(const ofSoundBuffer &buffer, string path);
+bool ofxSaveSound(const ofSoundBuffer &buffer, std::string path);
 
 class ofxSoundFile {
 public:
 	ofxSoundFile();
-	ofxSoundFile(string path);
+	ofxSoundFile(std::string path);
 
 	virtual ~ofxSoundFile();
 	void close();
@@ -44,10 +44,10 @@ public:
 	/// opens a sound file for reading with readTo().
 	/// encoding support varies by platform.
 	/// Windows and OSX use libaudiodecoder for decoding, Linux uses libsndfile
-	bool load(string _path);
+	bool load(std::string _path);
 	
 	/// writes an ofSoundBuffer as a 16-bit PCM WAV file
-	bool save(string _path, const ofSoundBuffer &buffer);
+	bool save(std::string _path, const ofSoundBuffer &buffer);
 
 	/// reads a file into an ofSoundBuffer.
 	/// by default, this will resize the buffer to fit the entire file.
@@ -64,7 +64,7 @@ public:
 	const unsigned long getNumSamples() const;
 	const bool isCompressed() const;
 	const bool isLoaded() const;
-	const string getPath() const;
+	const std::string getPath() const;
 
 private:
 	
@@ -72,9 +72,9 @@ private:
 	bool mpg123ReadFile(ofSoundBuffer & buffer);
 	bool ladReadFile(ofSoundBuffer & buffer);
 	
-	bool sfOpen(string path);
-	bool mpg123Open(string path);
-	bool ladOpen(string path);
+	bool sfOpen(std::string path);
+	bool mpg123Open(std::string path);
+	bool ladOpen(std::string path);
 	
 	void initDecodeLib();
 	
@@ -102,7 +102,7 @@ private:
 	unsigned int samples;
 	int samplerate;
 	int bitDepth;
-	string path;
+	std::string path;
 	bool bCompressed;
 	bool bLoaded;
 };

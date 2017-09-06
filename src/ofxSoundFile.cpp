@@ -9,6 +9,8 @@
 #include "ofLog.h"
 #include "ofUtils.h"
 
+using namespace std;
+
 //--------------------------------------------------------------
 bool ofxLoadSound(ofSoundBuffer &buff, string path){
     ofxSoundFile sf(path);
@@ -75,6 +77,9 @@ ofxSoundFile::~ofxSoundFile() {
 //--------------------------------------------------------------
 bool ofxSoundFile::load(string _path){
  	path = ofToDataPath(_path);
+	if(!std::filesystem::exists(std::filesystem::path(path))){
+		return false;
+	}
 	bool result = false;
 	if(ofFilePath::getFileExt(path)=="mp3"){
         bCompressed=true;
