@@ -218,10 +218,17 @@ int AudioDecoderMediaFoundation::seek(int sampleIdx)
 
 int AudioDecoderMediaFoundation::read(int size, const SAMPLE *destination)
 {
-	assert(size < sizeof(m_destBufferShort));
+	if (m_destBufferShort.size() < size+1) {
+		m_destBufferShort.assign(size+1, 0);
+	}
+
+	//std::cout << "AudioDecoderMediaFoundation :: read: size: " << size << " m_destBufferShort: " << sizeof(m_destBufferShort) << std::endl;
+
+	//assert(size < sizeof(m_destBufferShort));
+	assert(size < m_destBufferShort.size());
     if (sDebug) { std::cout << "read() " << size << std::endl; }
 	//TODO: Change this up if we want to support just short samples again -- Albert
-    SHORT_SAMPLE *destBuffer = m_destBufferShort;
+    SHORT_SAMPLE *destBuffer = m_destBufferShort.data();
 	size_t framesRequested(size / m_iChannels);
     size_t framesNeeded(framesRequested);
 
@@ -502,14 +509,16 @@ bool AudioDecoderMediaFoundation::configureAudioStream()
 	hr = m_pAudioType->GetUINT32(MF_MT_AUDIO_NUM_CHANNELS, &numChannels);
 	hr = m_pAudioType->GetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, &samplesPerSecond);
 
-	std::cout << "bitsPerSample: " << bitsPerSample << std::endl;
-	std::cout << "allSamplesIndependent: " << allSamplesIndependent << std::endl;
-	std::cout << "fixedSizeSamples: " << fixedSizeSamples << std::endl;
-	std::cout << "sampleSize: " << sampleSize << std::endl;
-	std::cout << "bitsPerSample: " << bitsPerSample << std::endl;
-	std::cout << "blockAlignment: " << blockAlignment << std::endl;
-	std::cout << "numChannels: " << numChannels << std::endl;
-	std::cout << "samplesPerSecond: " << samplesPerSecond << std::endl;
+	if (sDebug) {
+		std::cout << "bitsPerSample: " << bitsPerSample << std::endl;
+		std::cout << "allSamplesIndependent: " << allSamplesIndependent << std::endl;
+		std::cout << "fixedSizeSamples: " << fixedSizeSamples << std::endl;
+		std::cout << "sampleSize: " << sampleSize << std::endl;
+		std::cout << "bitsPerSample: " << bitsPerSample << std::endl;
+		std::cout << "blockAlignment: " << blockAlignment << std::endl;
+		std::cout << "numChannels: " << numChannels << std::endl;
+		std::cout << "samplesPerSecond: " << samplesPerSecond << std::endl;
+	}
 
 	m_iChannels = numChannels;
 	m_iSampleRate = samplesPerSecond;
@@ -621,7 +630,7 @@ bool AudioDecoderMediaFoundation::configureAudioStream()
         MF_SOURCE_READER_FIRST_AUDIO_STREAM,
         true);
     if (FAILED(hr)) {
-        std::cerr << "SSMF: failed to select first audio stream (again)";
+        std::cerr << "SSMF: failed to select first audio stream (again)" << std::endl;
         return false;
     }
 
@@ -632,7 +641,14 @@ bool AudioDecoderMediaFoundation::configureAudioStream()
     UINT32 leftoverBufferSize = 0;
     hr = m_pAudioType->GetUINT32(MF_MT_SAMPLE_SIZE, &leftoverBufferSize);
     if (FAILED(hr)) {
-        std::cerr << "SSMF: failed to get buffer size";
+		if (hr == MF_E_INVALIDTYPE) {
+			std::cerr << "SSMF: The attribute value is not a UINT32 " << std::endl;
+		}
+		else if (hr == MF_E_ATTRIBUTENOTFOUND) {
+			std::cerr << "SSMF: The attribute value MF_E_ATTRIBUTENOTFOUND " << std::endl;
+		}
+
+		std::cerr << "SSMF: failed to get buffer size" << std::endl;
 		leftoverBufferSize = 32;
        // return false;
     }
