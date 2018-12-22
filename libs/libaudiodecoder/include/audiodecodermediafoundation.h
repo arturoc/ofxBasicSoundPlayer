@@ -56,7 +56,8 @@ class AudioDecoderMediaFoundation : public AudioDecoderBase {
     bool m_dead;
     bool m_seeking;
 	unsigned int m_iBitsPerSample;
-	SHORT_SAMPLE m_destBufferShort[32768];
+	//SHORT_SAMPLE m_destBufferShort[32768]; //32768
+	std::vector<SHORT_SAMPLE> m_destBufferShort;
 };
 
 #endif // ifndef AUDIODECODERMEDIAFOUNDATION_H
