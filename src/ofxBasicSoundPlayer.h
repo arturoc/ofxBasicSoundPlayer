@@ -7,11 +7,12 @@
 
 #pragma once
 
-#include "ofBaseSoundPlayer.h"
+#include "ofSoundBaseTypes.h"
 #include "ofBaseTypes.h"
 #include "ofConstants.h"
 #include "ofSoundBuffer.h"
 #include "ofThread.h"
+#include "ofLog.h"
 
 #include "ofSoundStream.h"
 #include "ofEvents.h"
