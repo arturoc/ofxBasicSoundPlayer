@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "ofConstants.h"
+#include "ofMathConstants.h"
 #include "ofSoundBuffer.h"
 
 #if defined (TARGET_OSX) || defined (TARGET_WIN32) || defined (TARGET_OS_IPHONE)
